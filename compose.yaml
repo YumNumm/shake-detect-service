@@ -1,0 +1,8 @@
+services:
+  shake-detect-service:
+    image: shake-detect-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
