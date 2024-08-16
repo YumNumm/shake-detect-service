@@ -105,7 +105,7 @@ public class KyoshinMonitorWatchService
   private static readonly Histogram kyoshinMonitorProcessDuration = Metrics.CreateHistogram("kyoshin_monitor_process_duration_seconds", "The duration of processing KyoshinMonitor data");
 
   private static readonly Counter kyoshinMonitorFetchError = Metrics.CreateCounter("kyoshin_monitor_fetch_error", "The count of KyoshinMonitor fetch error");
-
+  private static readonly Counter kyoshinMonitorFetchSuccess = Metrics.CreateCounter("kyoshin_monitor_fetch_success", "The count of KyoshinMonitor fetch success");
   private static readonly Counter kyoshinMonitorShakeEvent = Metrics.CreateCounter("kyoshin_monitor_shake_event", "The count of KyoshinMonitor shake event");
 
   private async Task TimerElapsed(DateTime realTime)
@@ -138,6 +138,7 @@ public class KyoshinMonitorWatchService
            var url = WebApiUrlGenerator.Generate(WebApiUrlType.RealtimeImg, time, RealtimeDataType.Shindo, false);
            response = await httpClient.GetAsync(url);
          }
+         kyoshinMonitorFetchSuccess.Inc();
          if (response.StatusCode != HttpStatusCode.OK)
          {
            Offset = Math.Min(5000, Offset + 100);
