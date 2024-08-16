@@ -398,7 +398,7 @@ public class KyoshinMonitorWatchService
       File.WriteAllText(path, JsonSerializer.Serialize(KyoshinEvents, new JsonSerializerOptions()
       {
         WriteIndented = true,
-        ReferenceHandler = ReferenceHandler.IgnoreCycles
+        ReferenceHandler = ReferenceHandler.Preserve
       }));
     }
   }
