@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.Net;
 using System.Text.Json;
 using KyoshinEewViewer.Core.Models;
@@ -8,6 +9,7 @@ using KyoshinMonitorLib;
 using KyoshinMonitorLib.SkiaImages;
 using KyoshinMonitorLib.UrlGenerator;
 using Microsoft.Extensions.Logging;
+using Prometheus;
 using SkiaSharp;
 
 namespace ShakeDetectService;
@@ -98,6 +100,13 @@ public class KyoshinMonitorWatchService
 
   private bool IsRunning { get; set; }
   private double Offset { get; set; } = 1000;
+
+  private static readonly Histogram kyoshinMonitorFetchDuration = Metrics.CreateHistogram("kyoshin_monitor_fetch_duration_seconds", "The duration of fetching KyoshinMonitor data");
+  private static readonly Histogram kyoshinMonitorProcessDuration = Metrics.CreateHistogram("kyoshin_monitor_process_duration_seconds", "The duration of processing KyoshinMonitor data");
+
+  private static readonly Counter kyoshinMonitorFetchError = Metrics.CreateCounter("kyoshin_monitor_fetch_error", "The count of KyoshinMonitor fetch error");
+
+
   private async Task TimerElapsed(DateTime realTime)
   {
     // 観測点が読み込みできていなければ処理しない
@@ -115,53 +124,72 @@ public class KyoshinMonitorWatchService
     if (IsRunning)
       return;
     IsRunning = true;
-    try
-    {
-      {
-        // 画像をGET
-        var url = WebApiUrlGenerator.Generate(WebApiUrlType.RealtimeImg, time, RealtimeDataType.Shindo, false);
-        using var response = await httpClient.GetAsync(url);
-        if (response.StatusCode != HttpStatusCode.OK)
-        {
-          Offset = Math.Min(5000, Offset + 100);
-          Logger.LogInformation($"{time:HH:mm:ss} オフセットを調整してください。: {Offset}ms");
-          return;
-        }
-        // オフセットが大きい場合1分に1回短縮を試みる
-        if (time.Second == 0 && Offset > 1100)
-          Offset -= 100;
 
-        //画像から取得
-        var bitmap = SKBitmap.Decode(await response.Content.ReadAsStreamAsync());
-        if (bitmap != null)
-          using (bitmap)
-            ProcessImage(bitmap, time);
-      }
-    }
-    catch (AggregateException ex)
-    {
-      Logger.LogWarning(ex, "取得に失敗しました。");
-    }
-    catch (TaskCanceledException ex)
-    {
-      Logger.LogWarning(ex, "取得にタイムアウトしました。");
-    }
-    catch (KyoshinMonitorException ex)
-    {
-      Logger.LogWarning(ex, "取得にタイムアウトしました。");
-    }
-    catch (HttpRequestException ex)
-    {
-      Logger.LogWarning(ex, "HTTPエラー");
-    }
-    catch (Exception ex)
-    {
-      Logger.LogWarning(ex, "汎用エラー");
-    }
-    finally
-    {
-      IsRunning = false;
-    }
+    await kyoshinMonitorFetchError.CountExceptions(
+     async () =>
+     {
+       try
+       {
+         HttpResponseMessage response;
+         using (kyoshinMonitorFetchDuration.NewTimer())
+         {
+           // 画像をGET
+           var url = WebApiUrlGenerator.Generate(WebApiUrlType.RealtimeImg, time, RealtimeDataType.Shindo, false);
+           response = await httpClient.GetAsync(url);
+         }
+         if (response.StatusCode != HttpStatusCode.OK)
+         {
+           Offset = Math.Min(5000, Offset + 100);
+           Logger.LogInformation($"{time:HH:mm:ss} オフセットを調整してください。: {Offset}ms");
+           return;
+         }
+         // オフセットが大きい場合1分に1回短縮を試みる
+         if (time.Second == 0 && Offset > 1100)
+           Offset -= 100;
+
+         //画像から取得
+         var bitmap = SKBitmap.Decode(await response.Content.ReadAsStreamAsync());
+         if (bitmap != null)
+           using (kyoshinMonitorProcessDuration.NewTimer())
+           {
+             using (bitmap)
+             {
+               ProcessImage(bitmap, time);
+             }
+           }
+
+       }
+       catch (AggregateException ex)
+       {
+         Logger.LogWarning(ex, "取得に失敗しました。");
+         throw;
+       }
+       catch (TaskCanceledException ex)
+       {
+         Logger.LogWarning(ex, "取得にタイムアウトしました。");
+         throw;
+       }
+       catch (KyoshinMonitorException ex)
+       {
+         Logger.LogWarning(ex, "取得にタイムアウトしました。");
+         throw;
+       }
+       catch (HttpRequestException ex)
+       {
+         Logger.LogWarning(ex, "HTTPエラー");
+         throw;
+       }
+       catch (Exception ex)
+       {
+         Logger.LogWarning(ex, "汎用エラー");
+         throw;
+       }
+       finally
+       {
+         IsRunning = false;
+       }
+     }
+    );
   }
 
   private List<KyoshinEvent> KyoshinEvents { get; } = [];
