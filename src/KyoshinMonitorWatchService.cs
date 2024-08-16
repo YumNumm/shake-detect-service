@@ -34,7 +34,17 @@ public class KyoshinMonitorWatchService
   {
     Logger = (LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger("KyoshinMonitorWatchService"));
     TimerService = new TimerService();
-    TimerService.TimerElapsed += t => TimerElapsed(t).Wait();
+    TimerService.TimerElapsed += t =>
+    {
+      try
+      {
+        TimerElapsed(t).Wait();
+      }
+      catch (Exception ex)
+      {
+        Logger.LogError(ex, "タイマー処理中にエラーが発生しました");
+      }
+    };
     webApi = new WebApi();
   }
 
