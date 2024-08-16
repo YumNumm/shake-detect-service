@@ -40,9 +40,9 @@ public class KyoshinMonitorWatchService
       {
         TimerElapsed(t).Wait();
       }
-      catch (Exception ex)
+      catch (Exception)
       {
-        Logger.LogError(ex, "タイマー処理中にエラーが発生しました");
+        return;
       }
     };
     webApi = new WebApi();
