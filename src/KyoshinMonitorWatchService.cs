@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Net;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using KyoshinEewViewer.Core.Models;
 using KyoshinEewViewer.Series.KyoshinMonitor.Services;
 using KyoshinEewViewer.Services;
@@ -394,7 +395,11 @@ public class KyoshinMonitorWatchService
         Directory.CreateDirectory(dir);
 
       Directory.CreateDirectory(dir);
-      File.WriteAllText(path, JsonSerializer.Serialize(KyoshinEvents));
+      File.WriteAllText(path, JsonSerializer.Serialize(KyoshinEvents, new JsonSerializerOptions()
+      {
+        WriteIndented = true,
+        ReferenceHandler = ReferenceHandler.IgnoreCycles
+      }));
     }
   }
 
