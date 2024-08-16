@@ -1,6 +1,7 @@
 using KyoshinMonitorLib;
 using SkiaSharp;
 using System;
+using System.Text.Json.Serialization;
 
 namespace KyoshinEewViewer.Core.Models;
 
@@ -105,6 +106,7 @@ public class RealtimeObservationPoint
   /// <summary>
   /// 紐づいた強震イベント
   /// </summary>
+  [JsonIgnore]
   public KyoshinEvent? Event { get; set; }
   public DateTime EventedAt { get; set; }
   public DateTime EventedExpireAt { get; set; }
@@ -114,10 +116,12 @@ public class RealtimeObservationPoint
   /// </summary>
   public bool HasValidHistory { get; set; }
 
+  [JsonIgnore]
   private RealtimeObservationPoint[]? _nearPoints;
   /// <summary>
   /// 近くの観測点
   /// </summary>
+  [JsonIgnore]
   public RealtimeObservationPoint[]? NearPoints
   {
     get => _nearPoints;
