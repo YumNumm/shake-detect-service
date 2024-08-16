@@ -106,6 +106,7 @@ public class KyoshinMonitorWatchService
 
   private static readonly Counter kyoshinMonitorFetchError = Metrics.CreateCounter("kyoshin_monitor_fetch_error", "The count of KyoshinMonitor fetch error");
 
+  private static readonly Counter kyoshinMonitorShakeEvent = Metrics.CreateCounter("kyoshin_monitor_shake_event", "The count of KyoshinMonitor shake event");
 
   private async Task TimerElapsed(DateTime realTime)
   {
@@ -360,6 +361,8 @@ public class KyoshinMonitorWatchService
     {
       Logger.LogWarning($"イベント: {evt.Id} {evt.CreatedAt} {evt.PointCount} {evt.Points.Select(p => p.Code).Aggregate((p, n) => $"{p},{n}")}");
     }
+
+    kyoshinMonitorShakeEvent.IncTo(KyoshinEvents.Count);
 
     // ファイル出力
     if (KyoshinEvents.Any())
