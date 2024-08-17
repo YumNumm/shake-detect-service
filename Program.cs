@@ -1,6 +1,7 @@
 ﻿using WebSocketSharp.Server;
 using Prometheus;
 using ShakeDetectService;
+using WebSocketSharp;
 
 
 
@@ -16,6 +17,7 @@ metricserver.Start();
 
 // Websocket server
 var wssv = new WebSocketServer(8181);
+wssv.AddWebSocketService<Echo>("/");
 wssv.Start();
 
 var watchService = new KyoshinMonitorWatchService(wssv);
@@ -23,3 +25,12 @@ watchService.Start();
 
 
 await Task.Delay(-1);
+
+
+public class Echo : WebSocketBehavior
+{
+  protected override void OnMessage(MessageEventArgs e)
+  {
+    Console.WriteLine("Received: " + e.Data);
+  }
+}
