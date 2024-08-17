@@ -5,7 +5,8 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5000:5000"
+      - "8181:8181" # WS
+      - "8182:8182" # Metrics
     restart: always
     volumes:
       - ./data:/app/data:rw
