@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "shake-detect-service", "shake-detect-service.csproj", "{B7C15E84-FE40-4CF4-A222-EEB0C41450A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "shake-detect-service", "shake-detect-service.csproj", "{80D93073-7E6D-469A-A979-CEC02F082F93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B7C15E84-FE40-4CF4-A222-EEB0C41450A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B7C15E84-FE40-4CF4-A222-EEB0C41450A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B7C15E84-FE40-4CF4-A222-EEB0C41450A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B7C15E84-FE40-4CF4-A222-EEB0C41450A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80D93073-7E6D-469A-A979-CEC02F082F93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80D93073-7E6D-469A-A979-CEC02F082F93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80D93073-7E6D-469A-A979-CEC02F082F93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80D93073-7E6D-469A-A979-CEC02F082F93}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {4D3C4D44-33C4-447B-B78E-43C6B9520720}
+		SolutionGuid = {60C52FD2-188C-40DB-87AF-A4BB2BD03828}
 	EndGlobalSection
 EndGlobal

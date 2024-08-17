@@ -94,6 +94,7 @@ public class KyoshinEvent
       > -1 => KyoshinEventLevel.Weak,
       _ => KyoshinEventLevel.Weaker,
     };
+
   public static int GetSeconds(KyoshinEventLevel level)
     => level switch
     {

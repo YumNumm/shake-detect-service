@@ -1,4 +1,5 @@
-﻿using Prometheus;
+﻿using WebSocketSharp.Server;
+using Prometheus;
 using ShakeDetectService;
 
 
@@ -9,10 +10,16 @@ Console.CancelKeyPress += (s, e) =>
       Environment.Exit(0);
     };
 
-var server = new MetricServer(13543);
-server.Start();
+var metricserver = new MetricServer(8182);
+metricserver.Start();
 
-var watchService = new KyoshinMonitorWatchService();
+
+// Websocket server
+var wssv = new WebSocketServer(8181);
+wssv.Start();
+
+var watchService = new KyoshinMonitorWatchService(wssv);
 watchService.Start();
+
 
 await Task.Delay(-1);

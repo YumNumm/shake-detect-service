@@ -12,6 +12,7 @@ using KyoshinMonitorLib.UrlGenerator;
 using Microsoft.Extensions.Logging;
 using Prometheus;
 using SkiaSharp;
+using WebSocketSharp.Server;
 
 namespace ShakeDetectService;
 
@@ -29,9 +30,11 @@ public class KyoshinMonitorWatchService
   private TimerService TimerService { get; }
 
   private WebApi webApi { get; }
+  private WebSocketServer wssv { get; }
 
-  public KyoshinMonitorWatchService()
+  public KyoshinMonitorWatchService(WebSocketServer wssv)
   {
+    this.wssv = wssv;
     Logger = (LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger("KyoshinMonitorWatchService"));
     TimerService = new TimerService();
     TimerService.TimerElapsed += t =>
@@ -376,41 +379,18 @@ public class KyoshinMonitorWatchService
 
     kyoshinMonitorShakeEvent.IncTo(KyoshinEvents.Count);
 
-    // ファイル出力
-    if (KyoshinEvents.Any())
-    {
-      var baseDirectoryBinIndex = AppContext.BaseDirectory.IndexOf("bin/");
-      string path;
-      if (baseDirectoryBinIndex == -1)
-      {
-        path = Path.Combine(
-          AppContext.BaseDirectory,
-        "data", "events", $"{time:yyyyMMddHHmmss}.json"
-        );
-      }
-      else
-      {
-        path = Path.Combine(
-          AppContext.BaseDirectory.Substring(
-            0,
-            baseDirectoryBinIndex
-          ),
-        "data", "events", $"{time:yyyyMMddHHmmss}.json"
-        );
-      }
-      var dir = Path.GetDirectoryName(path);
-      if (dir == null)
-        return;
-      if (!Directory.Exists(dir))
-        Directory.CreateDirectory(dir);
+    broadcast(KyoshinEvents.ToArray());
+  }
 
-      Directory.CreateDirectory(dir);
-      File.WriteAllText(path, JsonSerializer.Serialize(KyoshinEvents, new JsonSerializerOptions()
-      {
-        WriteIndented = true,
-        ReferenceHandler = ReferenceHandler.Preserve
-      }));
-    }
+  private void broadcast(KyoshinEvent[] events)
+  {
+    var json = JsonSerializer.Serialize(events, new JsonSerializerOptions
+    {
+      Converters = { new JsonStringEnumConverter() }
+    });
+    wssv.WebSocketServices.Broadcast(json);
+
+
   }
 
 }
