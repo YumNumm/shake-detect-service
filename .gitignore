@@ -485,3 +485,6 @@ $RECYCLE.BIN/
 
 /out
 /data
+
+/*.json
+!/regions.json
