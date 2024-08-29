@@ -379,7 +379,10 @@ public class KyoshinMonitorWatchService
 
     kyoshinMonitorShakeEvent.IncTo(KyoshinEvents.Count);
 
-    broadcast(KyoshinEvents.ToArray());
+    if (KyoshinEvents.Any())
+    {
+      broadcast(KyoshinEvents.ToArray());
+    }
   }
 
   private void broadcast(KyoshinEvent[] events)
