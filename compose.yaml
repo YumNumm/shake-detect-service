@@ -10,3 +10,9 @@ services:
     restart: always
     volumes:
       - ./data:/app/data:rw
+    networks:
+      - external
+
+networks:
+  external:
+    external: true

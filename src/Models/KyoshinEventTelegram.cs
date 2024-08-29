@@ -30,6 +30,7 @@ public class KyoshinEventTelegram
 }
 
 
+
 public class KyoshinEventObservationRegion
 {
 
