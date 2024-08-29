@@ -277,9 +277,9 @@ ServiceFabricBackup/
 *.bim.layout
 *.bim_*.settings
 *.rptproj.rsuser
-*- [Bb]ackup.rdl
-*- [Bb]ackup ([0-9]).rdl
-*- [Bb]ackup ([0-9][0-9]).rdl
+*-[Bb]ackup.rdl
+*-[Bb]ackup ([0-9]).rdl
+*-[Bb]ackup ([0-9][0-9]).rdl
 
 # Microsoft Fakes
 FakesAssemblies/
@@ -488,3 +488,4 @@ $RECYCLE.BIN/
 
 /*.json
 !/regions.json
+!/sample-ws-message.json

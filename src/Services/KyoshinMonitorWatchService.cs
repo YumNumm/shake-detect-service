@@ -379,21 +379,26 @@ public class KyoshinMonitorWatchService
 
     kyoshinMonitorShakeEvent.IncTo(KyoshinEvents.Count);
 
-    if (KyoshinEvents.Any())
+    if (KyoshinEvents.Any() || hadEvents)
     {
+      hadEvents = KyoshinEvents.Any();
       broadcast(KyoshinEvents.ToArray());
     }
   }
 
+  /// 前回まではイベントが1つ以上あったかどうか
+  private bool hadEvents { get; set; } = false;
+
   private void broadcast(KyoshinEvent[] events)
   {
-    var json = JsonSerializer.Serialize(events, new JsonSerializerOptions
-    {
-      Converters = { new JsonStringEnumConverter() }
-    });
+    var json = JsonSerializer.Serialize(
+      events.Select(e => new KyoshinEventTelegram(e)).ToArray(),
+       new JsonSerializerOptions
+       {
+         Converters = { new JsonStringEnumConverter() }
+       }
+      );
     wssv.WebSocketServices.Broadcast(json);
-
-
   }
 
 }
